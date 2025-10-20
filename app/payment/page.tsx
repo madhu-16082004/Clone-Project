@@ -1,4 +1,5 @@
-'use client';
+// app/payment/page.tsx
+'use client'; // required for client-side hooks
 
 import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -12,13 +13,12 @@ interface PaymentIntentResponse {
   error?: string;
 }
 
-const PaymentPage = () => {
+export default function PaymentPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Hardcoded amount in smallest currency unit (e.g., ₹50 = 5000 paisa)
-  const amount = 5000;
+  const amount = 5000; // smallest currency unit, e.g., ₹50 = 5000 paisa
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -32,15 +32,13 @@ const PaymentPage = () => {
         const data: PaymentIntentResponse = await res.json();
 
         if (data.error) {
-          console.error('Stripe Error:', data.error);
           setError(data.error);
           setClientSecret(null);
-        } else if (data.client_secret) {
-          setClientSecret(data.client_secret);
+        } else {
+          setClientSecret(data.client_secret || null);
         }
       } catch (err: any) {
-        console.error('Network Error:', err.message || err);
-        setError(err.message || 'Network error occurred');
+        setError(err.message || 'Network error');
         setClientSecret(null);
       } finally {
         setLoading(false);
@@ -48,7 +46,7 @@ const PaymentPage = () => {
     };
 
     createPaymentIntent();
-  }, [amount]);
+  }, []);
 
   if (loading) return <p>Loading payment…</p>;
   if (error) return <p>Error: {error}</p>;
@@ -59,6 +57,4 @@ const PaymentPage = () => {
       <CheckoutForm />
     </Elements>
   );
-};
-
-export default PaymentPage;
+}
