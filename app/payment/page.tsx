@@ -12,13 +12,10 @@ interface PaymentIntentResponse {
   error?: string;
 }
 
-interface PaymentPageProps {
-  amount: number; // amount in your currency's smallest unit (e.g., cents)
-}
-
-export default function PaymentPage({ amount = 50 }: PaymentPageProps) {
+export default function PaymentPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const amount = 50; // ✅ define inside the component
 
   useEffect(() => {
     const createPaymentIntent = async () => {
