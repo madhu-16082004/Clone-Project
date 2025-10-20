@@ -1,59 +1,37 @@
-'use client';
+'use client'; // must be first line
 
-import { useEffect, useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import CheckoutForm from '@/components/payment/CheckoutForm';
+import dynamic from 'next/dynamic';
+import Booking from '@/components/Booking/Booking';
+import { useContext } from 'react';
+import { UserLocationContext } from '@/components/UserLocationProvider';
+import { MapProvider } from '@/components/Map/MapContext';
+import { SelectedCarAmountProvider } from '@/components/Booking/Context/SelectedCarAmountContext';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// Dynamically import the map to avoid SSR issues
+const MapBoxMap = dynamic(() => import('@/components/Map/MapBoxMap'), { ssr: false });
 
-interface PaymentIntentResponse {
-  client_secret: string;
-  error?: string;
-}
-
-interface PaymentPageProps {
-  amount?: number; // amount in smallest unit (e.g., cents)
-}
-
-export default function PaymentPage({ amount = 5000 }: PaymentPageProps) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const createPaymentIntent = async () => {
-      try {
-        const res = await fetch('/api/create-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount }),
-        });
-
-        const data: PaymentIntentResponse = await res.json();
-
-        if (data.error) {
-          console.error('Stripe Error:', data.error);
-          setClientSecret(null);
-        } else {
-          setClientSecret(data.client_secret);
-        }
-      } catch (err) {
-        console.error('Network Error:', err);
-        setClientSecret(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    createPaymentIntent();
-  }, [amount]);
-
-  if (loading) return <p>Loading payment…</p>;
-  if (!clientSecret) return <p>Unable to initialize payment. Please try again.</p>;
+export default function Home() {
+  const { userLocation, setUserLocation } = useContext(UserLocationContext);
 
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret }}>
-      <CheckoutForm />
-    </Elements>
+    <SelectedCarAmountProvider>
+      <MapProvider>
+        <div className="p-4">
+          <h1 className="text-2xl font-bold mb-4">My Taxi App</h1>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Booking form on left */}
+            <div className="bg-white p-4 rounded shadow">
+              <Booking />
+            </div>
+
+            {/* Map on right, taking 2 columns */}
+            <div className="col-span-2 bg-gray-100 p-4 rounded shadow">
+              <MapBoxMap />
+            </div>
+          </div>
+        </div>
+      </MapProvider>
+    </SelectedCarAmountProvider>
   );
 }

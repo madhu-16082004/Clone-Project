@@ -12,10 +12,13 @@ interface PaymentIntentResponse {
   error?: string;
 }
 
-export default function PaymentPage() {
+interface PaymentPageProps {
+  amount: number; // amount in your currency's smallest unit (e.g., cents)
+}
+
+export default function PaymentPage({ amount = 50 }: PaymentPageProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const amount = 5000; // default amount in smallest unit (e.g., cents)
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -43,10 +46,10 @@ export default function PaymentPage() {
     };
 
     createPaymentIntent();
-  }, []);
+  }, [amount]);
 
-  if (loading) return <p>Loading payment…</p>;
-  if (!clientSecret) return <p>Unable to initialize payment. Please try again.</p>;
+  if (loading) return <p>Looking for nearby drivers…</p>;
+  if (!clientSecret) return <p>Unable to initialize payment. Try again.</p>;
 
   return (
     <Elements stripe={stripePromise} options={{ clientSecret }}>
