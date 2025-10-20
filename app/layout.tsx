@@ -13,12 +13,23 @@ import HistoryPage from "@/components/Pages/HistoryPage";
 
 const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"] });
 
+export const metadata = {
+  title: 'My Taxi App',
+  description: 'Taxi service app',
+  icons: {
+    icon: '/taxi workers.png', // favicon path from public folder
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [activePage, setActivePage] = useState<'home' | 'about' | 'history'>('home');
 
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en">
+        <head>
+          <link rel="icon" href="/taxi workers.png" />
+        </head>
         <body className={`${outfit.variable} antialiased`}>
           <NavBar setActivePage={setActivePage} />
           <UserLocationProvider>

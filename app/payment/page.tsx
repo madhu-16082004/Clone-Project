@@ -1,5 +1,4 @@
-// app/payment/page.tsx
-'use client'; // required for client-side hooks
+'use client';
 
 import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -9,16 +8,17 @@ import CheckoutForm from '@/components/payment/CheckoutForm';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface PaymentIntentResponse {
-  client_secret?: string;
+  client_secret: string;
   error?: string;
 }
 
-export default function PaymentPage() {
+interface PaymentPageProps {
+  amount: number; // amount in your currency's smallest unit (e.g., cents)
+}
+
+export default function PaymentPage({ amount = 50 }: PaymentPageProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const amount = 5000; // smallest currency unit, e.g., ₹50 = 5000 paisa
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -32,13 +32,13 @@ export default function PaymentPage() {
         const data: PaymentIntentResponse = await res.json();
 
         if (data.error) {
-          setError(data.error);
+          console.error('Stripe Error:', data.error);
           setClientSecret(null);
         } else {
-          setClientSecret(data.client_secret || null);
+          setClientSecret(data.client_secret);
         }
-      } catch (err: any) {
-        setError(err.message || 'Network error');
+      } catch (err) {
+        console.error('Network Error:', err);
         setClientSecret(null);
       } finally {
         setLoading(false);
@@ -46,10 +46,9 @@ export default function PaymentPage() {
     };
 
     createPaymentIntent();
-  }, []);
+  }, [amount]);
 
-  if (loading) return <p>Loading payment…</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Looking for nearby drivers…</p>;
   if (!clientSecret) return <p>Unable to initialize payment. Try again.</p>;
 
   return (
