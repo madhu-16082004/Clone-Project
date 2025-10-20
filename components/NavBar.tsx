@@ -13,8 +13,8 @@ function NavBar({ setActivePage }: NavBarProps) {
       {/* Left side: Logo + Menu */}
       <div className="flex gap-10 items-center">
         <Image
-          src="/Taxi Workers.png"
-          alt="logo"
+          src="/taxi-workers.png" // Updated: no spaces
+          alt="Taxi Logo"
           width={100}
           height={100}
         />

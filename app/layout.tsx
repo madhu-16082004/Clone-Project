@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <head>
           {/* Favicon */}
-          <link rel="icon" href="/taxi workers.png" />
+          <link rel="icon" href="/Taxiworkers.png" />
           <title>My Taxi App</title>
         </head>
         <body className={`${outfit.variable} antialiased`}>
